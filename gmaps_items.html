@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Items Map</title>
+
+    <script type="text/javascript" 
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js">
+    </script>
+    <script type="text/javascript" 
+	src="http://maps.google.com/maps/api/js?sensor=false&key=AIzaSyCmvgHoVojEa9ohPKiJArV-_l7LvMvTBsM">
+    </script>
+
+    <script type="text/javascript">
+	// http://articles.sitepoint.com/article/google-maps-api-jquery
+	var ItemMap = {
+	    bounds: null,
+	    map: null
+	}
+	ItemMap.init = function(selector, center, zoom) {
+	    var map_options = {
+		zoom: zoom,
+		center: center,
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	    }
+	    this.map = new google.maps.Map($(selector)[0], map_options);
+	    this.bounds = new google.maps.LatLngBounds();		
+	}
+	ItemMap.draw = function(filename) {
+			$.getJSON(filename, function(json) {
+			console.log(json['location']); // this will show the info it in firebug console
+			json['location'].forEach(function(item) {
+			var title = item.address;
+		    
+		    // Create a new LatLng point
+		    var lat = item.lat;
+		    var lon = item.lng;
+		    var point = new google.maps.LatLng(
+			parseFloat(lat),
+			parseFloat(lon)
+		    );
+
+		    // Extend the bounds to include the new point
+		    ItemMap.bounds.extend(point);
+
+		    // Add the marker itself
+		    var marker = new google.maps.Marker({
+			position: point,
+			map: ItemMap.map
+		    });
+		    
+		    var circle = new google.maps.Circle({
+			radius: 200, 
+			center: point,
+			map: ItemMap.map,
+			fillColor: '#FF0000',
+			fillOpacity: 0.2,
+			strokeColor: '#FF0000',
+			strokeOpacity: 0.6
+		    }); 
+
+		    // Create the tooltip and its text
+		    var infoWindow = new google.maps.InfoWindow();
+		    var html = title;
+
+		    // Add a listener
+		    google.maps.event.addListener(marker, 'click', function() {
+			infoWindow.setContent(html);
+			infoWindow.open(ItemMap.map, marker);
+		    });
+		    google.maps.event.addListener(circle, 'click', function() {
+			infoWindow.setContent(html);
+			infoWindow.open(ItemMap.map, circle);
+		    });
+		});
+
+		// Fit the map around the markers we added:
+		ItemMap.map.fitBounds(ItemMap.bounds);
+	    });
+	}
+	$(document).ready(function() {
+	    var center = new google.maps.LatLng(27, 75);
+	    ItemMap.init('#map', center, 15);
+	    ItemMap.draw('data.json');
+	});
+    </script>
+</head>
+<body>
+    <div id="map" style="width: 100%;height: 100%;position: absolute;"></div>
+</body>
+</html>
