@@ -18,6 +18,22 @@
 	    bounds: null,
 	    map: null
 	}
+	
+	var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }
+    }
+};
+	
 	ItemMap.init = function(selector, center, zoom) {
 	    var map_options = {
 		zoom: zoom,
@@ -27,8 +43,12 @@
 	    this.map = new google.maps.Map($(selector)[0], map_options);
 	    this.bounds = new google.maps.LatLngBounds();		
 	}
-	ItemMap.draw = function(filename) {
-			$.getJSON(filename, function(json) {
+	
+	var access_token = getUrlParameter('token');
+	
+	
+	ItemMap.draw = function(json) {
+// 			$.getJSON(filename, function(json) {
 			console.log(json['location']); // this will show the info it in firebug console
 			json['location'].forEach(function(item) {
 			var title = item.address;
@@ -77,13 +97,26 @@
 
 		// Fit the map around the markers we added:
 		ItemMap.map.fitBounds(ItemMap.bounds);
-	    });
+// 	    });
 	}
-	$(document).ready(function() {
-	    var center = new google.maps.LatLng(27, 75);
-	    ItemMap.init('#map', center, 15);
-	    ItemMap.draw('data.json');
-	});
+	 var url = "https://milkbasket.qandle.com/timeattendance/employee/clockin-time?access_token=";
+	jQuery.ajax({
+    url: this.url+access_token, //This URL is for Json file
+    type:"GET",
+    dataType: "json",
+    success: function(data) {
+        iterateJson(data);
+    },
+    error: function() {
+        //Do alert is error
+    }
+});
+	     function iterateJson(data) {
+		     var center = new google.maps.LatLng(27, 75);
+	    	     ItemMap.init('#map', center, 15);
+	    	     ItemMap.draw(data["data"]);
+	     }
+	
     </script>
 </head>
 <body>
