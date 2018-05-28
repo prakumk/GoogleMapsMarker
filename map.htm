@@ -103,6 +103,10 @@
 	jQuery.ajax({
     url: this.url+access_token, //This URL is for Json file
     type:"GET",
+	headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+		'device': 'website'
+    },
     dataType: "json",
     success: function(data) {
         iterateJson(data);
