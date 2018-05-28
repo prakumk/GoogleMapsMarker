@@ -103,10 +103,6 @@
 	jQuery.ajax({
     url: this.url+access_token, //This URL is for Json file
     type:"GET",
-	headers: {
-		'device': 'website',
-		'Origin' : 'https://milkbasket.qandle.com'
-    },
     dataType: "json",
     success: function(data) {
         iterateJson(data);
