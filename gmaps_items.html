@@ -32,11 +32,11 @@
 			alert('Access Token Expired');
 			console.log(json['location']); // this will show the info it in firebug console
 			json['location'].forEach(function(item) {
-			var title = item.address;
+			var title = item.name;
 		    
 		    // Create a new LatLng point
-		    var lat = item.lat;
-		    var lon = item.lng;
+		    var lat = item.lattitude;
+		    var lon = item.longitude;
 		    var point = new google.maps.LatLng(
 			parseFloat(lat),
 			parseFloat(lon)
